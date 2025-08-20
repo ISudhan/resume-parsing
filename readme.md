@@ -12,8 +12,6 @@ git clone https://github.com/ISudhan/resume-parsing.git
 
 cd resume-parsing
 
-pip install -r requirements.txt
-
 pip install rapidfuzz
 
 uvicorn api:app --reload
