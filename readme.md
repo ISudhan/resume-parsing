@@ -5,7 +5,7 @@ It automatically normalizes common issues such as missing `@`, wrong domains, ex
 
 ---
 
-## 📥 Installation
+##  Installation
 
 ``bash
 git clone https://github.com/ISudhan/resume-parsing.git
