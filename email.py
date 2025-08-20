@@ -38,7 +38,7 @@ def clean_and_correct_email(raw_email):
     if not local or not domain:
         return None
 
-    # ❌ Reject if domain does not contain a dot (like mace, localhost)
+    # Reject if domain does not contain a dot (like mace, localhost)
     if "." not in domain:
         return None
 
@@ -60,7 +60,7 @@ def extract_emails_from_text(text):
     return cleaned
 
 
-# 🔹 Example usage
+#  Example usage
 resume_text = """ """
 
 emails = extract_emails_from_text(resume_text)
