@@ -61,13 +61,7 @@ def extract_emails_from_text(text):
 
 
 # 🔹 Example usage
-resume_text = """
-yogeshsharma.mech@gmail.com
-system@mace
-fmea@mace
-measurables@mace
-deepa@@yahho.com
-"""
+resume_text = """ """
 
 emails = extract_emails_from_text(resume_text)
 
