@@ -9,9 +9,13 @@ It automatically normalizes common issues such as missing `@`, wrong domains, ex
 
 ``bash
 git clone https://github.com/ISudhan/resume-parsing.git
+
 cd resume-parsing
+
 pip install -r requirements.txt
+
 pip install rapidfuzz
+
 uvicorn api:app --reload
 
 
