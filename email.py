@@ -1,9 +1,7 @@
-# Ensure rapidfuzz is installed before running this script.
-# You can install it via: pip install rapidfuzz
 import re
 from rapidfuzz import process
 
-# List of valid domains we support
+# List of common valid domains (expandable)
 valid_domains = [
     "gmail.com", "yahoo.com", "yahoo.co.in",
     "hotmail.com", "outlook.com", "rediffmail.com",
@@ -11,43 +9,69 @@ valid_domains = [
 ]
 
 def clean_and_correct_email(raw_email):
-    # 1. Remove unwanted chars and normalize
-    email = raw_email.lower().strip()
-    email = email.replace(" ", "").replace("..", ".").replace(",,,", ",").replace(",,", ",")
-    email = re.sub(r'[^a-z0-9@._-]', '', email)
+    if not raw_email:
+        return None
 
-    # 2. Fix "at" → "@" and "dot" → "."
+    # Normalize
+    email = raw_email.lower()
+    email = email.replace(" ", "").replace("\n", "").replace("\r", "")
+    email = email.replace("..", ".").replace(",,,", ",").replace(",,", ",")
+
+    # Replace text patterns
     email = email.replace(" at ", "@").replace(" dot ", ".")
     email = email.replace("(at)", "@").replace("(dot)", ".")
+    email = email.replace("[at]", "@").replace("[dot]", ".")
     email = email.replace("at", "@").replace("dot", ".")
 
-    # 3. Extract parts
-    if "@" not in email:
-        return None  # invalid if no @ at all
-    local, _, domain = email.partition("@")
+    # Remove unwanted chars except @, ., -, _
+    email = re.sub(r'[^a-z0-9@._-]', '', email)
 
-    # 4. Auto-correct domain using fuzzy matching
+    # Fix multiple @
+    if email.count("@") > 1:
+        parts = email.split("@")
+        email = parts[0] + "@" + parts[-1]
+
+    # Split into local + domain
+    if "@" not in email:
+        return None
+    local, _, domain = email.partition("@")
+    if not local or not domain:
+        return None
+
+    # ❌ Reject if domain does not contain a dot (like mace, localhost)
+    if "." not in domain:
+        return None
+
+    # Auto-correct domain using fuzzy match
     best_match = process.extractOne(domain, valid_domains)
-    if best_match and best_match[1] > 70:  # similarity > 70%
+    if best_match and best_match[1] > 70:
         domain = best_match[0]
 
-    # 5. Return clean email
     return f"{local}@{domain}"
 
+def extract_emails_from_text(text):
+    # Roughly find all email-like candidates
+    candidates = re.findall(r"[a-zA-Z0-9._%+-]+(?:\s?@|\sat\s|\(at\))[a-zA-Z0-9.-]+", text)
+    cleaned = []
+    for c in candidates:
+        fixed = clean_and_correct_email(c)
+        if fixed and fixed not in cleaned:
+            cleaned.append(fixed)
+    return cleaned
 
-# 🔹 Test cases
-emails = [
-    "uj.m  @ gml . com",
-    "keerthi_suresh 123 @yaho .co . in",
-    "vijay.. kumar@@hotma..com",
-    "sudha r2001 @ outlok. com",
-    "pravinmec@ gmail. com,",
-    "deepa123 at rediffmail dot com",
-    "arun---raj1999@@@gail.con",   # typo domain
-    "xyz_user@hotmial.cm",          # typo domain
-    "keerthi@oulok.co",            # typo domain
-    "deepa@@yahho.com"              # typo domain
-]
 
+# 🔹 Example usage
+resume_text = """
+yogeshsharma.mech@gmail.com
+system@mace
+fmea@mace
+measurables@mace
+deepa@@yahho.com
+"""
+
+emails = extract_emails_from_text(resume_text)
+
+print("Extracted Emails:")
 for e in emails:
-    print(clean_and_correct_email(e))
+    print(e)
+
