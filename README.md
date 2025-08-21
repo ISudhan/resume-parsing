@@ -9,11 +9,17 @@ It automatically normalizes common issues such as missing `@`, wrong domains, ex
 ##  Installation
 
 ``bash
+python installation & add it to environmental variable
+
 git clone https://github.com/ISudhan/resume-parsing.git
 
 cd resume-parsing
 
 pip install rapidfuzz
+
+pip install uvicorn
+
+pip install fastapi
 
 uvicorn api:app --reload
 
