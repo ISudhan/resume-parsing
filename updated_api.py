@@ -9,6 +9,10 @@ valid_domains = [
     "icloud.com", "protonmail.com", "aol.com"
 ]
 
+def clean_start(text):
+    return re.sub(r'^[\d\W_]+', '', text)
+
+
 def clean_and_correct_email(raw_email):
     if not raw_email:
         return None
@@ -47,6 +51,8 @@ def clean_and_correct_email(raw_email):
     best_match = process.extractOne(domain, valid_domains)
     if best_match and best_match[1] > 70:
         domain = best_match[0]
+    local = clean_start(local)
+  
 
     return f"{local}@{domain}"
 
@@ -57,12 +63,13 @@ def extract_emails_from_text(text):
     for c in candidates:
         fixed = clean_and_correct_email(c)
         if fixed and fixed not in cleaned:
+
             cleaned.append(fixed)
     return cleaned
 
 
 #  Example usage
-resume_text = """ - john.doe@gmail.com"""
+resume_text = """ """
 
 emails = extract_emails_from_text(resume_text)
 
@@ -89,3 +96,4 @@ async def get_json(request: Request):
         results+=emails
 
     return {"received_data": results}
+
