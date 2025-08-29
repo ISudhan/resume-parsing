@@ -68,19 +68,21 @@ def extract_emails_from_text(text):
 def skill_extract(resume_text):
     import pandas as pd
 
-    # Read Excel without headers
-    skills_df = pd.read_excel("skills_dataset.xlsx", header=None)
+    # Read the unique skills file
+    skills_df = pd.read_excel("skills.xlsx")
 
-    # First column contains the skills
-    skills = skills_df[0].dropna().str.lower().tolist()
+    # Ensure lowercase and drop NaN
+    skills = skills_df["skill"].dropna().str.lower().tolist()
 
-    # Normalize input
+    # Normalize input text
     input_text_lower = resume_text.lower()
 
     # Extract matching skills
     skills_list = [skill for skill in skills if skill in input_text_lower]
 
     return skills_list
+
+
 
 
 
