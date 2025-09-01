@@ -1,3 +1,4 @@
+from fastapi import FastAPI, Request
 import re
 
 COURSE_PATTERNS = {
@@ -67,3 +68,25 @@ sample_text = """
 """
 
 print("CourseType: ",extract_course_types(sample_text))
+
+
+app = FastAPI()
+
+@app.post("/data/")
+async def get_json(request: Request):
+    # Accept either a single JSON or a list of JSONs
+    data_list = await request.json()
+
+    # If a single JSON is sent, wrap it in a list
+    if isinstance(data_list, dict):
+        data_list = [data_list]
+
+    results = []
+    for item in data_list:
+        sample_text = item.get("sample_text", "")
+        course = extract_course_types(sample_text)
+        results+=course
+
+    return {"received_data": results}
+
+
