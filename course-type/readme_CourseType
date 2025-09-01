@@ -1,0 +1,41 @@
+Course Type Extractor API: 
+
+A FastAPI-based microservice that extracts course/degree types (like B.Sc, MBA, PhD, Diploma, etc.) from input text using regular expressions (Regex).
+
+Features: 
+
+ Detects Undergraduate, Postgraduate, Doctoral, and Diploma course names
+
+ Handles multiple aliases (e.g., B.Sc, BS, Bachelor of Science)
+
+ Accepts both single JSON and list of JSON objects as input
+
+ Returns detected course types in a clean JSON response
+
+ Lightweight & easy to extend
+
+Installation: 
+
+ git clone https://github.com/ISudhan/resume-parsing.git
+
+ cd course-type
+
+ pip install uvicorn 
+
+ pip install fastapi 
+
+ uvicorn api:app --reload
+
+Example Request & Response: 
+
+Input (Single JSON)
+
+{
+  "text": "I have completed my B.Sc in Computer Science and MBA in Finance."
+}
+
+Output
+
+{
+  "received_data": ["B.Sc", "MBA"]
+}
