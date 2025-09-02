@@ -3,6 +3,7 @@ import pandas as pd
 from pydantic import BaseModel
 import re
 
+
 app = FastAPI()
 VALID_CODES = ['234', '971', '968', '965', '977', '852', '963', '356',
                '212', '81', '91', '44', '49', '61', '66', '34', '60',
