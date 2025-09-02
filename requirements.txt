@@ -1,3 +1,4 @@
 rapidfuzz
 uvicorn
 fastapi
+pandas
