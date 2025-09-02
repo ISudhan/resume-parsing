@@ -1,3 +1,5 @@
 rapidfuzz
 uvicorn
 fastapi
+pandas
+spacy
