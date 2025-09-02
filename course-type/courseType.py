@@ -52,23 +52,137 @@ COURSE_PATTERNS = {
     "ITI": [r"\bITI\b", r"\bIndustrial\s+Training\s+Institute\b"],
 }
 
-def extract_course_types(text, unique=True):
-    found = []
-    for course, patterns in COURSE_PATTERNS.items():
-        for pat in patterns:
-            if re.search(pat, text, re.IGNORECASE):
-                found.append(course)
-                break 
-    return list(dict.fromkeys(found)) if unique else found
+
+SUBJECT_PATTERNS = {
+    # ================= Engineering & Technology =================
+    "Computer Science Engineering": [r"\bcomputer\s+science\s+engineering\b", r"\bcse\b"],
+    "Computer Science and Design Engineering": [r"\bcomputer\s+science\s+and\s+design\s+engineering\b", r"\bcsd\b", r"\bcs\s*&?\s*design\b", r"\bcs\s+design\s+engg\b"],
+    "Information Technology": [r"\binformation\s+technology\b", r"\bit\b"],
+    "Electronics and Communication Engineering": [r"\belectronics\s+and\s+communication\s+engineering\b", r"\bece\b"],
+    "Electrical Engineering": [r"\belectrical\s+engineering\b", r"\bee\b"],
+    "Mechanical Engineering": [r"\bmechanical\s+engineering\b", r"\bmech\b"],
+    "Mechatronics Engineering": [r"\bmechatronics\s+engineering\b", r"\bmts\b"],
+    "Electronics and Instrumentation Engineering": [r"\belectronics\s+and\s+instrumentation\s+engineering\b", r"\beie\b"],
+    "Civil Engineering": [r"\bcivil\s+engineering\b", r"\bcivil\b"],
+    "Automobile Engineering": [r"\bautomobile\s+engineering\b", r"\bautomobile\b"],
+    "Aeronautical Engineering": [r"\baeronautical\s+engineering\b", r"\baero\b"],
+    "Artificial Intelligence and Machine Learning": [r"\bartificial\s+intelligence\s+and\s+machine\s+learning\b", r"\bai/ml\b"],
+    "Artificial Intelligence and Data Science": [r"\bartificial\s+intelligence\s+and\s+data\s+science\b", r"\bai/ds\b"],
+    "Data Science": [r"\bdata\s+science\b"],
+    "Robotics": [r"\brobotics\b"],
+    "Biotechnology Engineering": [r"\bbiotechnology\s+engineering\b", r"\bbiotech\s+engg\b"],
+    "Genetic Engineering": [r"\bgenetic\s+engineering\b"],
+    "Biomedical Engineering": [r"\biomedical\s+engineering\b"],
+    "Food Technology": [r"\bfood\s+technology\b", r"\bfood\s+engg\b"],
+    "Ceramic Engineering": [r"\bceramic\s+engineering\b"],
+    "Metallurgical Engineering": [r"\bmetallurgical\s+engineering\b", r"\bmetallurgy\b"],
+    "Naval Architecture": [r"\bnaval\s+architecture\b"],
+    "Ocean Engineering": [r"\bocean\s+engineering\b"],
+    "Instrumentation Engineering": [r"\binstrumentation\s+engineering\b"],
+    "Control Engineering": [r"\bcontrol\s+engineering\b"],
+    "Industrial Engineering": [r"\bindustrial\s+engineering\b"],
+    "Production Engineering": [r"\bproduction\s+engineering\b"],
+    "Manufacturing Engineering": [r"\bmanufacturing\s+engineering\b"],
+    "Textile Technology": [r"\btextile\s+technology\b"],
+    "Leather Technology": [r"\bleather\s+technology\b"],
+    "Rubber Technology": [r"\brubber\s+technology\b"],
+    "Polymer Engineering": [r"\bpolymer\s+engineering\b"],
+    "Environmental Engineering": [r"\benvironmental\s+engineering\b"],
+    "Energy Engineering": [r"\benergy\s+engineering\b"],
+    "Power Engineering": [r"\bpower\s+engineering\b"],
+    "Safety Engineering": [r"\bsafety\s+engineering\b"],
+    "Structural Engineering": [r"\bstructural\s+engineering\b"],
+    "Transport Engineering": [r"\btransport\s+engineering\b"],
+    "Geoinformatics Engineering": [r"\bgeoinformatics\s+engineering\b"],
+    "Mining Machinery": [r"\bmining\s+machinery\b"],
+    "Petrochemical Engineering": [r"\bpetrochemical\s+engineering\b"],
+    "Plastic Engineering": [r"\bplastic\s+engineering\b"],
+    "Thermal Engineering": [r"\bthermal\s+engineering\b"],
+    "Welding Technology": [r"\bwelding\s+technology\b"],
+
+    # ================= Science =================
+    "Physics": [r"\bphysics\b"],
+    "Chemistry": [r"\bchemistry\b"],
+    "Mathematics": [r"\bmathematics\b", r"\bmaths?\b"],
+    "Statistics": [r"\bstatistics\b"],
+    "Biology": [r"\bbiology\b"],
+    "Zoology": [r"\bzoology\b"],
+    "Botany": [r"\bbotany\b"],
+
+    # ================= Arts & Humanities =================
+    "English": [r"\benglish\b"],
+    "History": [r"\bhistory\b"],
+    "Political Science": [r"\bpolitical\s+science\b"],
+    "Psychology": [r"\bpsychology\b"],
+    "Sociology": [r"\bsociology\b"],
+    "Philosophy": [r"\bphilosophy\b"],
+
+    # ================= Commerce & Management =================
+    "Finance": [r"\bfinance\b"],
+    "Accounting": [r"\baccounting\b", r"\baccounts?\b"],
+    "Economics": [r"\beconomics\b"],
+    "Business Administration": [r"\bbusiness\s+administration\b", r"\bmba\b"],
+    "Human Resources": [r"\bhuman\s+resources\b", r"\bhr\b"],
+    "Marketing": [r"\bmarketing\b"],
+
+    # ================= Law, Medicine & Others =================
+    "Law": [r"\blaw\b", r"\bl\.?l\.?b\b", r"\bllb\b"],
+    "Nursing": [r"\bnursing\b", r"\bbsc\s+nursing\b"],
+    "Pharmacy": [r"\bpharmacy\b", r"\bbpharm\b", r"\bmpharm\b"],
+    "Medicine": [r"\bmedicine\b", r"\bmbbs\b"],
+    "Dentistry": [r"\bdentistry\b", r"\bbds\b", r"\bmds\b"],
+    "Physiotherapy": [r"\bphysiotherapy\b", r"\bpt\b", r"\bbpt\b"],
+    "Ayurveda": [r"\bayurveda\b", r"\bbams\b"],
+    "Homeopathy": [r"\bhomeopathy\b", r"\bbhms\b"],
+    "Unani Medicine": [r"\bunani\b", r"\bbums\b"],
+    "Veterinary Science": [r"\bveterinary\s+science\b", r"\bbvsc\b"],
+    "Hotel Management": [r"\bhotel\s+management\b", r"\bbhm\b"],
+    "Tourism": [r"\btourism\b"],
+    "Fine Arts": [r"\bfine\s+arts\b", r"\bbfa\b"],
+    "Performing Arts": [r"\bperforming\s+arts\b"],
+    "Music": [r"\bmusic\b"],
+    "Design": [r"\bdesign\b", r"\bbdes\b", r"\bmdes\b"],
+    "Fashion Technology": [r"\bfashion\s+technology\b"],
+    "Journalism": [r"\bjournalism\b", r"\bbjmc\b"],
+    "Mass Communication": [r"\bmass\s+communication\b"],
+    "Education": [r"\beducation\b", r"\bb\.?ed\b"],
+    "Library Science": [r"\blibrary\s+science\b"],
+    "Social Work": [r"\bsocial\s+work\b", r"\bmsw\b"],
+    "Public Administration": [r"\bpublic\s+administration\b"],
+}
 
 
 
-sample_text = """
+def detect_degree_with_subject(text: str, window_size: int = 50):
+    results = []
+    for degree, d_patterns in COURSE_PATTERNS.items():
+        for d_pattern in d_patterns:
+            for d_match in re.finditer(d_pattern, text, re.IGNORECASE):
 
+                start = max(0, d_match.start() - window_size)
+                end = min(len(text), d_match.end() + window_size)
+                snippet = text[start:end]
+
+                found_subject = None
+                for subject, s_patterns in SUBJECT_PATTERNS.items():
+                    for s_pattern in s_patterns:
+                        if re.search(s_pattern, snippet, re.IGNORECASE):
+                            found_subject = subject
+                            break
+                    if found_subject:
+                        break
+
+                results.append({
+                    "degree": degree,
+                    "course": found_subject
+                })
+    return results
+
+
+resume_text = """ 
 """
 
-print("CourseType: ",extract_course_types(sample_text))
-
+print(detect_degree_with_subject(resume_text))
 
 app = FastAPI()
 
@@ -84,10 +198,7 @@ async def get_json(request: Request):
     results = []
     for item in data_list:
         sample_text = item.get("resumeText", "")
-        course = extract_course_types(sample_text)
+        course = detect_degree_with_subject(sample_text)
         results+=course
 
     return {"received_data": results}
-
-
-
