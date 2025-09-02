@@ -112,17 +112,9 @@ def extract_name_from_resume(resume_text: str) -> str:
 
 
 def extract_clean_phone_numbers(text, default_code="+91"):
-    """
-    Extracts and cleans phone numbers from text with these rules:
-    1. Detects numbers with +country_code
-    2. Detects plain 11/12 digit numbers like 911234567890 -> split country + last 10 digits
-    3. Detects numbers without + but starting with valid country codes
-    4. Only accepts country codes from VALID_CODES list
-    """
     result = []
     seen = set()
 
-    # 1️⃣ Detect numbers with +country_code
     pattern_plus = r'(\+\d{1,3})[\s\-()]*([\d\s\-()]{6,14})'
     matches_plus = re.findall(pattern_plus, text)
     for code, number in matches_plus:
@@ -134,7 +126,6 @@ def extract_clean_phone_numbers(text, default_code="+91"):
                 seen.add(key)
                 result.append({"country_code": code, "number": clean_number})
 
-    # 2️⃣ Detect plain numbers (10–12 digits)
     pattern_plain = r'\b\d{10,12}\b'
     matches_plain = re.findall(pattern_plain, text)
     for num in matches_plain:
@@ -189,17 +180,14 @@ async def get_json(request: Request):
     if isinstance(data_list, dict):
         data_list = [data_list]
 
-    results = []
+    results = dict()
     for item in data_list:
         resume_text = item.get("resumeText", "")
         name = extract_name_from_resume(resume_text)
         skills = skill_extract(resume_text)
         numbers = extract_clean_phone_numbers(resume_text)
-        results.append({
+        results["name"] = name
+        results["skills"] = skills
+        results["numbers"] = numbers
 
-            "name": name,
-            "skills": skills,
-            "numbers": numbers
-        })
-
-    return {"parsed_data": results}
+    return results
