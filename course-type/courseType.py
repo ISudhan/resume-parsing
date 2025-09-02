@@ -83,10 +83,11 @@ async def get_json(request: Request):
 
     results = []
     for item in data_list:
-        sample_text = item.get("sample_text", "")
+        sample_text = item.get("resumeText", "")
         course = extract_course_types(sample_text)
         results+=course
 
     return {"received_data": results}
+
 
 
